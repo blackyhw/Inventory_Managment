@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/inventory_managment
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 4818139
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
