@@ -3,8 +3,10 @@ package com.gestionador.inventory_management.controller;
 import com.gestionador.inventory_management.model.Product;
 import com.gestionador.inventory_management.model.dtos.ProductDto;
 import com.gestionador.inventory_management.service.InventoryService;
+import com.gestionador.inventory_management.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.apache.coyote.Response;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +19,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class InventoryController {
     private final InventoryService inventoryService;
+    private final ProductService productService;
 
     @PostMapping("/create")
     public ResponseEntity<Product>createProduct(@RequestBody ProductDto product){
         return new ResponseEntity<>(inventoryService.save(product),HttpStatus.CREATED);
     }
+
     @GetMapping("/read")
     public ResponseEntity<List<Product>>getAllProducts(){
         return new ResponseEntity<>(inventoryService.getAllProducts(), HttpStatus.OK);
@@ -34,12 +38,18 @@ public class InventoryController {
         if(product == null){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Producto no encontrado");
         }
-        product.setName(productDto.getName());
-        product.setDescription(productDto.getDescription());
-        product.setQuantity(productDto.getQuantity());
-        product.setPrice(productDto.getPrice());
+        product = productService.updateProduct(product,productDto);
+        return new ResponseEntity<>(product,HttpStatus.OK);
+    }
 
-
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void>deleteProduct(@PathVariable Long id){
+        Product product = inventoryService.findById(id);
+        if(product == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Producto no encontrado");
+        }
+        inventoryService.deleteProduct(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 
